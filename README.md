@@ -1,2 +1,2 @@
-# cdev-github-repo
+# Connected Devices & Networked Interactions
 Connected Devices notes + projects
