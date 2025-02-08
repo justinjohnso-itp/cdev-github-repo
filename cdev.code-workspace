@@ -13,5 +13,7 @@
 			"path": "../../../../../../../Dropbox/NYU/Semester 2 ('25 Spring)/Connected Devices & Networked Interaction/cdev-github-repo/week-2-iot-dashboard"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "week-2-iot-dashboard"
+	}
 }
