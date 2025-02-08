@@ -1,47 +1,39 @@
-/*
-  WiFi TCP Client
-  TCP Socket client for WiFiNINA and WiFi101 libraries.
-  Connects to the TCP socket server, reads a sensor once
-  every five seconds, and sends a message with the reading.
+// Based off of TCP WifiClient example: https://tigoe.github.io/html-for-conndev/DeviceDataDashboard/
 
-  You'll need to include an arduino_secrets.h file with the following info:
-  #define SECRET_SSID "ssid"      // your network name
-  #define SECRET_PASS "password"  // your network password
-
-  Here's a test with netcat: 
-  char serverAddress[] = "x.x.x.x";  // replace with your computer's IP
-  then on your computer, run  netcat:
-  $ nc -klw 2 8080 | tee log.json
-  This will send the output to the command line and to a file called log.json
-
-  created 30 Dec 2022
-  updated 27 Jan 2025
-  by Tom Igoe
- */
+//
+//
+/* GENERAL INIT */
 
 #include <Arduino.h>
-#include <WiFiNINA.h>  // use this for Nano 33 IoT or MKR1010 boards
+#include <WiFiNINA.h> // use this for Nano 33 IoT or MKR1010 boards
 #include "arduino_secrets.h"
+#include "Adafruit_VL53L0X.h" // TOF sensor library
+Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
-// Initialize the Wifi client library
-WiFiClient client;
+//
+//
+/* WIFI INIT */
 
-// replace with your host computer's local IP address
-const char server[] = "10.18.159.239";
+WiFiClient client; // Init the Wifi client library
+
+const char server[] = "10.18.159.239"; // target server
 const int portNum = 8080;
-// change this to a unique name for the device:
-String deviceName = "justin-nano33iot";
-// message sending interval, in ms:
-int interval = 5000;
-// last time a message was sent, in ms:
-long lastSend = 0;
+String deviceName = "justin-nano33iot"; // Arduino device name
+
+const int changeThreshold = 10;
+int lastSensorVal = 0;
 
 void setup() {
-  //Initialize serial
-  Serial.begin(9600);
-  // if serial monitor's not open, wait 3 seconds:
-  if (!Serial) delay(3000);
- 
+
+  Serial.begin(115200);  // Init serial
+  while (! Serial) { // Wait until serial port is open
+    delay(1);
+  }
+
+  //
+  // 
+  /* WIFI SETUP */
+
   // Connect to WPA/WPA2 network.
   WiFi.begin(SECRET_SSID, SECRET_PASS);
 
@@ -58,11 +50,30 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.print("Signal Strength (dBm): ");
   Serial.println(WiFi.RSSI());
+
+  // 
+  // 
+  /* TOF SENSOR SETUP */
+
+  Serial.println("Adafruit VL53L0X test.");
+  if (!lox.begin()) {
+    Serial.println(F("Failed to boot VL53L0X"));
+    while(1);
+  }
+  
+  // power
+  Serial.println(F("VL53L0X API Continuous Ranging example\n\n"));
+
+  // start continuous ranging
+  lox.startRangeContinuous(50);
 }
 
 void loop() {
-  // if the client's not connected, connect:
-  if (!client.connected()) {
+  //
+  //
+  /* WIFI LOOP */ 
+
+  if (!client.connected()) { // connect to client
     Serial.println("connecting");
     Serial.println(server);
     Serial.println(portNum);
@@ -71,20 +82,25 @@ void loop() {
     return;
   }
 
-  // once every interval, get a reading and send it:
-  if (millis() - lastSend > interval) {
-    // read sensor:
-    int sensor = analogRead(A0);
-    // format the message as JSON string:
-    String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
-    // replace READING with the reading:
-    message.replace("READING", String(sensor));
-    // and DEVICE with your device's name:
-    message.replace("DEVICE", deviceName);
-    // send the message:
-    client.println(message);
-    // update the timestamp:
-    lastSend = millis();
+  //
+  //
+  /* TOF SENSOR LOOP */
+
+  if (lox.isRangeComplete()) {
+    int sensorVal = map(lox.readRange(), 0, 8190, 0, 100);
+
+    // if (abs(sensorVal - lastSensorVal) > changeThreshold) {
+      lastSensorVal = sensorVal;
+
+      // send the reading:
+      Serial.println(sensorVal);
+
+      String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
+      message.replace("READING", String(sensorVal));
+      message.replace("DEVICE", deviceName);
+      client.println(message);
+    // }
+
   }
 
   // check if there is incoming data available to be received
