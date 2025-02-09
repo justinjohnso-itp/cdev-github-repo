@@ -74,14 +74,14 @@ void loop() {
   //
   /* WIFI LOOP */ 
 
-  // if (!client.connected()) { // connect to client
-  //   Serial.println("connecting");
-  //   Serial.println(server);
-  //   Serial.println(portNum);
-  //   client.connect(server, portNum);
-  //   // skip the rest of the loop:
-  //   return;
-  // }
+  if (!client.connected()) { // connect to client
+    Serial.println("connecting");
+    Serial.println(server);
+    Serial.println(portNum);
+    client.connect(server, portNum);
+    // skip the rest of the loop:
+    return;
+  }
 
   //
   //
@@ -96,10 +96,10 @@ void loop() {
     // send the reading:
     Serial.println(sensorValSmoothed);
 
-    // String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
-    // message.replace("READING", String(sensorVal));
-    // message.replace("DEVICE", deviceName);
-    // client.println(message);
+    String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
+    message.replace("READING", String(sensorVal));
+    message.replace("DEVICE", deviceName);
+    client.println(message);
   }
 
   // check if there is incoming data available to be received
