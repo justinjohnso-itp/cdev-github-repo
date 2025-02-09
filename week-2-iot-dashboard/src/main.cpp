@@ -96,9 +96,10 @@ void loop() {
     // send the reading:
     Serial.println(sensorValSmoothed);
 
-    String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
+    String message = "{\"device\": \"DEVICE\", \"time\": \"TIMESTAMP\", \"sensor\": READING}";
     message.replace("READING", String(sensorVal));
     message.replace("DEVICE", deviceName);
+    message.replace("TIMESTAMP", String(millis()));
     client.println(message);
   }
 
@@ -110,3 +111,4 @@ void loop() {
     Serial.println(client.readString());
   }
 }
+
