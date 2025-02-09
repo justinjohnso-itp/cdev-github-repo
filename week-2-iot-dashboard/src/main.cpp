@@ -7,8 +7,10 @@
 #include <Arduino.h>
 #include <WiFiNINA.h> // use this for Nano 33 IoT or MKR1010 boards
 #include "arduino_secrets.h"
-#include "Adafruit_VL53L0X.h" // TOF sensor library
-Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+
+#include <Wire.h> // I2C library
+#include <VL53L0X.h> // TOF sensor library
+VL53L0X sensor;
 
 //
 //
@@ -20,12 +22,14 @@ const char server[] = "10.18.159.239"; // target server
 const int portNum = 8080;
 String deviceName = "justin-nano33iot"; // Arduino device name
 
-const int changeThreshold = 10;
+const int changeThreshold = 2; // change threshold for sensor readings
+const int maxDistance = 250; // max distance in mm
 int lastSensorVal = 0;
 
 void setup() {
 
   Serial.begin(115200);  // Init serial
+  Wire.begin(); // Init I2C
   while (! Serial) { // Wait until serial port is open
     delay(1);
   }
@@ -54,18 +58,15 @@ void setup() {
   // 
   // 
   /* TOF SENSOR SETUP */
-
-  Serial.println("Adafruit VL53L0X test.");
-  if (!lox.begin()) {
-    Serial.println(F("Failed to boot VL53L0X"));
-    while(1);
+  
+  sensor.setTimeout(500);
+  if (!sensor.init())
+  {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1) {}
   }
   
-  // power
-  Serial.println(F("VL53L0X API Continuous Ranging example\n\n"));
-
-  // start continuous ranging
-  lox.startRangeContinuous(50);
+  sensor.startContinuous(50); // 50ms polling interval
 }
 
 void loop() {
@@ -73,34 +74,32 @@ void loop() {
   //
   /* WIFI LOOP */ 
 
-  if (!client.connected()) { // connect to client
-    Serial.println("connecting");
-    Serial.println(server);
-    Serial.println(portNum);
-    client.connect(server, portNum);
-    // skip the rest of the loop:
-    return;
-  }
+  // if (!client.connected()) { // connect to client
+  //   Serial.println("connecting");
+  //   Serial.println(server);
+  //   Serial.println(portNum);
+  //   client.connect(server, portNum);
+  //   // skip the rest of the loop:
+  //   return;
+  // }
 
   //
   //
   /* TOF SENSOR LOOP */
 
-  if (lox.isRangeComplete()) {
-    int sensorVal = map(lox.readRange(), 0, 8190, 0, 100);
+  int sensorVal = sensor.readRangeContinuousMillimeters();
+  int sensorValSmoothed = lastSensorVal * 0.9 + sensorVal * 0.1;
 
-    // if (abs(sensorVal - lastSensorVal) > changeThreshold) {
-      lastSensorVal = sensorVal;
+  if (sensorVal < maxDistance && abs(sensorVal - lastSensorVal) > changeThreshold) {
+    lastSensorVal = sensorVal;
 
-      // send the reading:
-      Serial.println(sensorVal);
+    // send the reading:
+    Serial.println(sensorValSmoothed);
 
-      String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
-      message.replace("READING", String(sensorVal));
-      message.replace("DEVICE", deviceName);
-      client.println(message);
-    // }
-
+    // String message = "{\"device\": \"DEVICE\", \"sensor\": READING}";
+    // message.replace("READING", String(sensorVal));
+    // message.replace("DEVICE", deviceName);
+    // client.println(message);
   }
 
   // check if there is incoming data available to be received
