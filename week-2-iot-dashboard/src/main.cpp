@@ -1,4 +1,5 @@
 // Based off of TCP WifiClient example: https://tigoe.github.io/html-for-conndev/DeviceDataDashboard/
+// Used this example to get current time: https://nerdhut.de/2021/12/15/arduino-esp32-esp8266-ntp/
 
 //
 //
@@ -6,7 +7,10 @@
 
 #include <Arduino.h>
 #include <WiFiNINA.h> // use this for Nano 33 IoT or MKR1010 boards
+#include <WiFiUdp.h> // UDP library for NTP
+#include <NTPClient.h> // NTP library
 #include "arduino_secrets.h"
+#include <time.h>
 
 #include <Wire.h> // I2C library
 #include <VL53L0X.h> // TOF sensor library
@@ -25,6 +29,16 @@ String deviceName = "justin-nano33iot"; // Arduino device name
 const int changeThreshold = 2; // change threshold for sensor readings
 const int maxDistance = 250; // max distance in mm
 int lastSensorVal = 0;
+
+//
+//
+/* NTP INIT */
+
+const long utcOffsetUSEast = -18000; // Offset from UTC in seconds (-18000 seconds = -5h) -- UTC-5 (Eastern Standard Time)
+ 
+// Define NTP Client to get time
+WiFiUDP udpSocket;
+NTPClient ntpClient(udpSocket, "pool.ntp.org", utcOffsetUSEast);
 
 void setup() {
 
@@ -54,6 +68,8 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.print("Signal Strength (dBm): ");
   Serial.println(WiFi.RSSI());
+
+  ntpClient.begin(); // Start NTP
 
   // 
   // 
@@ -96,10 +112,21 @@ void loop() {
     // send the reading:
     Serial.println(sensorValSmoothed);
 
-    String message = "{\"device\": \"DEVICE\", \"time\": \"TIMESTAMP\", \"sensor\": READING}";
+    // get current time
+    // TODO: Use WIFININA .getTime() instead
+    ntpClient.update();
+    time_t epochTime = ntpClient.getEpochTime();
+    struct tm *ptm = gmtime((time_t *)&epochTime);
+    char dateString[11];
+    // format the date and time:
+    sprintf(dateString, "%04d-%02d-%02d", ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday);
+    String timestamp = ntpClient.getFormattedTime();
+
+    String message = "{\"device\": \"DEVICE\", \"time\": \"DATETTIME\", \"sensor\": READING}";
     message.replace("READING", String(sensorVal));
     message.replace("DEVICE", deviceName);
-    message.replace("TIMESTAMP", String(millis()));
+    message.replace("DATE", String(dateString));
+    message.replace("TIME", timestamp);
     client.println(message);
   }
 
@@ -111,4 +138,3 @@ void loop() {
     Serial.println(client.readString());
   }
 }
-
