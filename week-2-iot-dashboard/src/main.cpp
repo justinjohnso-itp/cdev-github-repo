@@ -113,7 +113,7 @@ void loop() {
     Serial.println(sensorValSmoothed);
 
     // get current time
-    // TODO: Use WIFININA .getTime() instead
+    // TODO: Use WIFININA .getTime() instead: https://docs.arduino.cc/libraries/wifinina/#%60WiFi.getTime()%60
     ntpClient.update();
     time_t epochTime = ntpClient.getEpochTime();
     struct tm *ptm = gmtime((time_t *)&epochTime);
