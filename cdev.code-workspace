@@ -11,6 +11,9 @@
 		{
 			"name": "week-2-iot-dashboard",
 			"path": "../../../../../../../Dropbox/NYU/Semester 2 ('25 Spring)/Connected Devices & Networked Interaction/cdev-github-repo/week-2-iot-dashboard"
+		},
+		{
+			"path": "../cdev-iot-dashboard-app"
 		}
 	],
 	"settings": {
