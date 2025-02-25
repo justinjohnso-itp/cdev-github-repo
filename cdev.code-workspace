@@ -14,6 +14,10 @@
 		},
 		{
 			"path": "../cdev-iot-dashboard-app"
+		},
+		{
+			"name": "week-6-class",
+			"path": "../../../../../../../Dropbox/NYU/Semester 2 ('25 Spring)/Connected Devices & Networked Interaction/cdev-github-repo/week-6-class"
 		}
 	],
 	"settings": {
