@@ -10,7 +10,7 @@ const int lightNumber = 10;  // The ID of the light you want to control
 // Pin definitions
 const int toggleSwitchPin = 2;  // Digital pin for the toggle switch
 const int brightnessPotPin = A0;  // Analog pin for brightness potentiometer
-const int colorTempPotPin = A1;  // Analog pin for color temperature potentiometer
+// const int colorTempPotPin = A1;  // Analog pin for color temperature potentiometer
 
 // Variables to track state
 bool isLightOn = false;
@@ -18,7 +18,7 @@ int currentBrightness = 0;  // Range: 0-254
 int currentColorTemp = 0;   // Range: 153-500 (mired scale)
 int lastBrightnessValue = -1;
 int lastColorTempValue = -1;
-int lastSwitchState = -1;
+// int lastSwitchState = -1;
 
 // Control parameters
 const int minBrightness = 1;      // Minimum brightness value (0-254)
@@ -89,16 +89,16 @@ void loop() {
   int mappedColorTemp = map(colorTempValue, 0, 1023, minColorTemp, maxColorTemp); // 153 (6500K) to 500 (2000K)
   
   // Log sensor inputs for debugging in a structured format
-  // Serial.print(F(">> Switch: "));
-  // Serial.print(switchState);
-  // Serial.print(F(" | Brightness: raw="));
-  // Serial.print(brightnessValue);
-  // Serial.print(F(", mapped="));
-  // Serial.print(mappedBrightness);
-  // Serial.print(F(" | Color Temp: raw="));
-  // Serial.print(colorTempValue);
-  // Serial.print(F(", mapped="));
-  // Serial.println(mappedColorTemp);
+  Serial.print(F(">> Switch: "));
+  Serial.print(switchState);
+  Serial.print(F(" | Brightness: raw="));
+  Serial.print(brightnessValue);
+  Serial.print(F(", mapped="));
+  Serial.print(mappedBrightness);
+  Serial.print(F(" | Color Temp: raw="));
+  Serial.print(colorTempValue);
+  Serial.print(F(", mapped="));
+  Serial.println(mappedColorTemp);
   
   // Check if switch state changed
   if (switchState != lastSwitchState) {
@@ -107,7 +107,7 @@ void loop() {
       Serial.println(F(">> Light power state changed"));
     }
     lastSwitchState = switchState;
-    delay(debounceDelay); // Debounce
+    // delay(debounceDelay); // Debounce
   }
   
   // Only send brightness updates if the light is on and the value changed significantly
