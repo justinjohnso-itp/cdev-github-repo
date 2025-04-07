@@ -4,7 +4,8 @@
 #include "arduino_secrets.h"
 
 // Hue control settings - modify these values as needed
-const int lightNumber = 1;  // The ID of the light you want to control
+const int lightNumber = 10;  // The ID of the light you want to control
+// Light array: [1, 4, 7, 8, 9, 10, 11, 12, 13, 14]
 
 // Pin definitions
 const int toggleSwitchPin = 2;  // Digital pin for the toggle switch
@@ -87,11 +88,23 @@ void loop() {
   int mappedBrightness = map(brightnessValue, 0, 1023, minBrightness, maxBrightness);
   int mappedColorTemp = map(colorTempValue, 0, 1023, minColorTemp, maxColorTemp); // 153 (6500K) to 500 (2000K)
   
+  // Log sensor inputs for debugging in a structured format
+  Serial.print(F(">> Switch: "));
+  Serial.print(switchState);
+  Serial.print(F(" | Brightness: raw="));
+  Serial.print(brightnessValue);
+  Serial.print(F(", mapped="));
+  Serial.print(mappedBrightness);
+  Serial.print(F(" | Color Temp: raw="));
+  Serial.print(colorTempValue);
+  Serial.print(F(", mapped="));
+  Serial.println(mappedColorTemp);
+  
   // Check if switch state changed
   if (switchState != lastSwitchState) {
     isLightOn = switchState;
     if (sendHueCommand("on", isLightOn ? "true" : "false")) {
-      Serial.println(F("Light power state changed"));
+      Serial.println(F(">> Light power state changed"));
     }
     lastSwitchState = switchState;
     delay(debounceDelay); // Debounce
@@ -101,7 +114,7 @@ void loop() {
   if (isLightOn && abs(mappedBrightness - lastBrightnessValue) > updateThreshold) {
     currentBrightness = mappedBrightness;
     if (sendHueCommand("bri", String(currentBrightness))) {
-      Serial.print(F("Brightness updated to: "));
+      Serial.print(F(">> Updated Brightness to "));
       Serial.println(currentBrightness);
     }
     lastBrightnessValue = currentBrightness;
@@ -112,7 +125,7 @@ void loop() {
   if (isLightOn && abs(mappedColorTemp - lastColorTempValue) > updateThreshold) {
     currentColorTemp = mappedColorTemp;
     if (sendHueCommand("ct", String(currentColorTemp))) {
-      Serial.print(F("Color temperature updated to: "));
+      Serial.print(F(">> Updated Color Temperature to "));
       Serial.println(currentColorTemp);
     }
     lastColorTempValue = currentColorTemp;
