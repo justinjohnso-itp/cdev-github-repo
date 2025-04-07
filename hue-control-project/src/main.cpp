@@ -81,7 +81,7 @@ void loop() {
   int switchState = !digitalRead(toggleSwitchPin);
   
   // Read potentiometers
-  int brightnessValue = analogRead(brightnessPotPin);
+  int brightnessValue1 = analogRead(brightnessPotPin);
   int colorTempValue = analogRead(colorTempPotPin);
   
   // Map potentiometer values to Hue ranges
@@ -89,16 +89,16 @@ void loop() {
   int mappedColorTemp = map(colorTempValue, 0, 1023, minColorTemp, maxColorTemp); // 153 (6500K) to 500 (2000K)
   
   // Log sensor inputs for debugging in a structured format
-  Serial.print(F(">> Switch: "));
-  Serial.print(switchState);
-  Serial.print(F(" | Brightness: raw="));
-  Serial.print(brightnessValue);
-  Serial.print(F(", mapped="));
-  Serial.print(mappedBrightness);
-  Serial.print(F(" | Color Temp: raw="));
-  Serial.print(colorTempValue);
-  Serial.print(F(", mapped="));
-  Serial.println(mappedColorTemp);
+  // Serial.print(F(">> Switch: "));
+  // Serial.print(switchState);
+  // Serial.print(F(" | Brightness: raw="));
+  // Serial.print(brightnessValue);
+  // Serial.print(F(", mapped="));
+  // Serial.print(mappedBrightness);
+  // Serial.print(F(" | Color Temp: raw="));
+  // Serial.print(colorTempValue);
+  // Serial.print(F(", mapped="));
+  // Serial.println(mappedColorTemp);
   
   // Check if switch state changed
   if (switchState != lastSwitchState) {
