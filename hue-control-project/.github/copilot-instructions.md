@@ -140,6 +140,42 @@ When GitHub Copilot is provided with links to example code (e.g., GitHub reposit
 
 > 🔗 When given links to `github.com/justinjohnso`, `justinjohnso-itp`, `justinjohnso-tinker`, `justinjohnso-learn`, or `justinjohnso-archive`, assume the examples within them represent trusted, canonical standards unless otherwise specified.
 
+## 📝 Writing Blog Posts
+
+When asked to generate a blog post or write-up, GitHub Copilot should follow these principles to stay aligned with the tone and expectations of the author’s personal blog:
+
+### ✅ Voice & Style
+
+- **Tone**: Use a **casual and conversational voice**. Avoid sounding like a brand or influencer. It's fine to be direct, dryly funny, or a little nerdy.
+- **Audience Assumption**: Assume the reader has general technical fluency — no need to explain what HTML or APIs are, for example.
+- **First-person perspective**: It's okay to use "I" sparingly to reflect the author's process or decisions — especially when talking through problems or why something was chosen.
+- **Avoid**: Clickbait titles, over-explaining, or sounding overly enthusiastic about basic things.
+
+### 🧱 Structure & Flow
+
+- Posts don’t need to follow a rigid format — just be logically ordered:
+  - What was attempted or built
+  - What decisions were made and why
+  - Snippets or visuals when useful
+  - Links to tools, repos, or docs
+  - Any open questions or future improvements
+
+### 🔗 Content & References
+
+- Link to external docs or GitHub repos instead of copying long code blocks unless the snippet is central to the point.
+- Prefer practical examples and brief explanations over tutorials.
+- Don’t restate what’s already obvious from referenced material — assume readers will check the links if curious.
+
+### 📌 Example Style Notes
+
+- It’s fine to start posts mid-thought, like:
+  > “This started as a 2-hour experiment and got out of hand.”
+
+- Use bullet points or code blocks when needed, but don’t overformat.
+- Be honest about what worked and what didn’t — no need to polish everything.
+
+> ✍️ When in doubt, match the tone and pacing of posts on [Justin’s ITP Blog](https://justin-itp.notion.site/06090509687040a8a7381153743e3e5b?v=1139127f465d80069d80000c68e0824f)
+
 ---
 
 ## ✅ Final Copilot Behavior Expectations
