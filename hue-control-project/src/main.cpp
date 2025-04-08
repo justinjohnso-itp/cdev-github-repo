@@ -21,7 +21,7 @@ int lastColorTempValue = -1;
 int lastSwitchState = -1;
 
 // Control parameters
-const int minBrightness = 1;      // Minimum brightness value (0-254)
+const int minBrightness = 0;      // Minimum brightness value (0-254)
 const int maxBrightness = 254;    // Maximum brightness value (0-254)
 const int minColorTemp = 153;     // Minimum color temp in mired (6500K)
 const int maxColorTemp = 500;     // Maximum color temp in mired (2000K)
@@ -78,14 +78,14 @@ void loop() {
   }
   
   // Read toggle switch (inverted because of INPUT_PULLUP)
-  int switchState = !digitalRead(toggleSwitchPin);
+  int switchState = digitalRead(toggleSwitchPin);
   
   // Read potentiometers
   int brightnessValue = analogRead(brightnessPotPin);
   int colorTempValue = analogRead(colorTempPotPin);
   
   // Map potentiometer values to Hue ranges
-  int mappedBrightness = map(brightnessValue, 0, 1023, minBrightness, maxBrightness);
+  int mappedBrightness = map(brightnessValue, 0, 1023, maxBrightness, minBrightness);
   int mappedColorTemp = map(colorTempValue, 0, 1023, minColorTemp, maxColorTemp); // 153 (6500K) to 500 (2000K)
   
   // Log sensor inputs for debugging in a structured format
